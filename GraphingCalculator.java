@@ -46,6 +46,7 @@ String newLine = System.lineSeparator();
 boolean debug;
 int totalRight = 0;
 int totalWrong = 0;
+private OperandPair  op = new OperandPair();
 
 	public static void main(String[] args) 
 	{
@@ -134,6 +135,9 @@ int totalWrong = 0;
 		toX.addActionListener(this);
 	}
 
+	/********************************************************
+	 * EXPRESSION CALCULATOR INTERFACE FUNCTION
+	 ********************************************************/
 	@Override
 	public String calculate(String Expression, String x)
 			throws IllegalArgumentException {
@@ -141,7 +145,7 @@ int totalWrong = 0;
 		
 		//test cases
 		if(Expression.contains("X"))
-			Expression.replace('X', 'x');
+			Expression = Expression.replaceAll("X", "x");
 		if(Expression.contains("x"))
 		{
 			if(forX.getText().isEmpty())
@@ -159,6 +163,9 @@ int totalWrong = 0;
 		return ans.toString();
 	}
 
+	/*******************************************************
+	 * ACCUMULATOR INTERFACE FUNCTION
+	 *******************************************************/
 	@Override
 	public String accumulate(String total, String amount)
 			throws IllegalArgumentException {
@@ -209,7 +216,6 @@ int totalWrong = 0;
 				System.out.println("Final result: " + totalString);
 			
 			return totalString;
-
 		}
 		
 		catch(NumberFormatException nfe)
@@ -217,13 +223,6 @@ int totalWrong = 0;
 			throw new IllegalArgumentException("Please enter proper arguments. Entered argument"
 					+ " was :" + amount);
 		}		
-	}
-
-	@Override
-	public void drawGraph(String expression, String xStart, String increment)
-			throws IllegalArgumentException {
-		// TODO Implement function for graphing calculator.
-		
 	}
 
 	@Override
@@ -319,7 +318,7 @@ int totalWrong = 0;
 				catch(IllegalArgumentException e)
 				{
 					// If parse not successful, Update error message.
-					errorLabelField.setText(e.toString());
+					errorLabelField.setText(e.getMessage());
 				}
 			}
 				
@@ -346,7 +345,6 @@ int totalWrong = 0;
 					errorLabelField.setText("");
 					
 					// Update the log by reading in the input and appending it to the log.
-					// NOTE-JJ - Append to log Display (not Total Display)
 					logDisplay.append(newLine + input + " = " + total + newLine);
 				    // scroll the outChatArea to the bottom
 				    logDisplay.setCaretPosition(logDisplay.getDocument().getLength());
@@ -355,7 +353,7 @@ int totalWrong = 0;
 				catch(IllegalArgumentException e)
 				{
 					// If parse not successful, Update error message.
-					errorLabelField.setText(e.toString());
+					errorLabelField.setText(e.getMessage());
 				}
 			}
 			
@@ -363,7 +361,9 @@ int totalWrong = 0;
 			{
 				learningMode(inputArea.getText(), forX.getText());
 			}
-			
+			/***************************************************
+			 * TODO GRAPHING MODE PART
+			 ***************************************************/
 			else if(graphMode.isSelected() == true)
 			{
 			}
@@ -421,9 +421,336 @@ int totalWrong = 0;
 		}				
 	}
 	
-	// TODO : Check and implement parse_expression
+	/*************************************************************
+	 * HELPER METHODS FOR EXPRESSION CALCULATOR
+	 ************************************************************/
+	
+	// parses a complicated expression.
 	public double parse_expression(String exp, String text) throws IllegalArgumentException
 	{
-		return -1;
+		//API to outside world. Returns evaluated outside value.
+    	
+		Double ans;
+    	// Remove spaces in the expression.
+    	exp = remove_spaces(exp);
+    	
+    	try
+    	{
+        	// replace constants with their values in the expression.
+    		exp = replace_consts(exp, text);
+    		exp = eval_parentheses(exp);
+    		if(exp.contains("--"))
+    			exp = exp.replace("--", "+");
+    		if(!isDouble(exp))
+    			ans = evaluateComplexExpression(exp);
+    		else
+    			ans = Double.parseDouble(exp);
+    	}
+    	catch(Exception e)
+    	{
+    		throw new IllegalArgumentException(e.getMessage());
+    	}
+    	if(Double.isInfinite(ans) || Double.isNaN(ans))
+    		throw new IllegalArgumentException("Cannot divide by zero or number is too big.");
+        return ans;
 	}
+	
+	// Removes all spaces in a string and returns it.
+	public String remove_spaces(String exp)
+    {
+        //Returns expression without spaces/
+       
+        StringBuilder sb = new StringBuilder(exp);
+        
+        //remove spaces at corners without concern for surroundings.
+        if(sb.charAt(0) == ' ')
+        {
+            sb.deleteCharAt(0);
+        }
+        if(sb.charAt(exp.length()-1) == ' ')
+        {
+            sb.deleteCharAt(exp.length()-1);
+        }
+
+        String acc = "-+*/r^x)( pie.";
+        //iterate through rest
+        for(int i=1; i<sb.length()-1 ; i++)
+        {
+			 //check for invalid vals
+			 char c = sb.charAt(i);
+			 //must be digit or one of these vals.
+			 if(acc.indexOf(c) == -1 && !Character.isDigit(c))
+			 {
+			     throw new IllegalArgumentException("Invalid character detected: " + c);
+			     
+			 }
+            if(sb.charAt(i) == ' ')
+            {
+                //Don't remove char if surroundings are both digits
+                if(!(Character.isDigit(sb.charAt(i)) 
+                   && Character.isDigit(sb.charAt(i))))
+                   {
+                       sb.deleteCharAt(i);
+                   }
+            }
+        }
+        return sb.toString();          
+    }
+	
+	// Replace the constants in a String with its numerical value.
+	public String replace_consts(String exp, String x)
+    {
+        String expression = exp;
+
+        // If expression contains x, replace it with input.
+        // If no value is given for x, throw exception. 
+        if(expression.contains("x")){
+            try
+            {
+            	Double.parseDouble(x);
+            }
+            catch(Exception NumberFormatException)
+            {
+                throw new IllegalArgumentException("Entered value is not a number");
+            }
+            expression = expression.replaceAll("x", x);
+        }
+        
+        // Replace the mathematical constants.
+        expression = expression.replaceAll("pi",Double.toString(Math.PI));
+        expression = expression.replaceAll("PI",Double.toString(Math.PI));
+        expression = expression.replaceAll("e",Double.toString(Math.E));
+        expression = expression.replaceAll("E",Double.toString(Math.E));
+        expression = expression.replaceAll("R","r");
+        
+        return expression;
+    }
+	
+	// Evaluates expression with (multiple) parentheses until we end up with 
+	// a simple/compound expression.
+	public String eval_parentheses(String exp)
+    {	
+
+    	// Find the number of open and closed parentheses and see if they are equal.
+		int openPar = exp.length() - exp.replace(")", "").length();
+    	int closePar = exp.length() - exp.replace("(", "").length();
+    	
+    	// TEST CASES    	
+    	if(openPar != closePar)
+    		throw new IllegalArgumentException("Error. Please enter missing parantheses.");
+    	if(exp.contains(")("))
+			throw new IllegalArgumentException("Error. Parantheses not in right order.");
+    	
+		while(exp.contains("("))
+		{	
+			// 1. Find index of first ")" and then form a substring till that index.
+			// 2. Then in that substring find the last "(".
+			// 3. Finally send the expression inside to eval_exp function and replace it.
+			// 4. Repeat until all parentheses disappear.
+			
+			int m = exp.indexOf(')');
+    		int n = exp.substring(0,m).lastIndexOf('(');
+    		
+    		String toSend = exp.substring(n+1, m);
+    		// To be tested.
+    		String result = Double.toString(evaluateComplexExpression(toSend));
+    		exp = exp.replace(exp.substring(n, m+1), result);
+    		if(debug)
+    			System.out.println("Expression: " + exp);
+		}
+        return exp;
+    }
+    
+	// Professor's helper methods.
+    private double evaluateComplexExpression(String expression)
+            throws IllegalArgumentException
+   {
+	   // THERE SHOULD BE NO PARENTHESES IN THE EXPRESSION 
+	   // System.out.println("Expression sent to evaluateExpression() is " + expression);
+	   // Reduce the expression by replacing inner simple expressions
+	   // in operator-precedence sequence.
+	   int    operatorOffset,operator1Offset,operator2Offset;
+	   double result = 0;
+	   char[] operators = {'^','r','*','/','+','-'};//in priority sequence
+	   
+	   for (int i = 0; i < operators.length; i = i+2)
+	       {
+	       while (true) // operators of equal priority are
+	             {      // executed in left-to-right sequence.
+	             operator1Offset = expression.indexOf(operators[i]);
+	             operator2Offset = expression.indexOf(operators[i+1]);
+	             if (operator1Offset == operator2Offset) break;//both are -1(neither found)
+	             if (operator1Offset == -1) operatorOffset = operator2Offset;
+	        else if (operator2Offset == -1) operatorOffset = operator1Offset;
+	             // both operators are found:
+	        else if (operator1Offset < operator2Offset)
+	     	        operatorOffset  = operator1Offset;
+	     	     else               
+	     	        operatorOffset  = operator2Offset;
+	             
+	             OperandPair op = findAdjacentOperands(expression,operatorOffset);
+	             result = calculateSimpleExpression(op.leftOperandValue,
+	             		                           expression.charAt(operatorOffset),
+	             		                           op.rightOperandValue);
+	             if ((op.previousOperatorOffset == -1) // both point off the ends of the expression
+	              && (op.nextOperatorOffset == expression.length()))
+	                return result; // THAT WAS THE LAST SIMPLE EXPRESSION!
+	             expression = expression.substring(0, op.previousOperatorOffset+1)
+	                        + String.valueOf(result).replaceFirst("-","n")
+	                        + expression.substring(op.nextOperatorOffset);
+	             // System.out.println("new expression is " + expression);
+	             } // exit from while(true) when neither operator is found above.
+	       }
+	   // See if the "expression" is just a number
+	   try 
+	   {
+	 	  if (expression.startsWith("n")) // watch for unary...
+	 		  expression = "-" + expression.substring(1);
+	 	  if (expression.startsWith("-n")) // watch for unary...
+	 		  expression = expression.substring(2);
+	 	  result = Double.parseDouble(expression);
+	 	  return result;
+	   }
+	   catch(NumberFormatException nfe)
+	   {
+		   // shouldn't have parts left when all operators have been processed.
+		   throw new IllegalArgumentException("Invalid expression. Remaining partial is " + expression );
+       }
+   } 
+    
+    private OperandPair findAdjacentOperands(String expression, int operatorOffset)
+			throws IllegalArgumentException
+	{
+		// A single OperandPair object is (explicitly, not
+		// implicitly)made when Calculator is loaded. This single
+		// object is reused as a data-bean to return the
+		// multiple values from this method whenever it is called.
+		// This method is not called recursively, so only a single
+		// OperandPair object is in play at a time, and a new
+		// one need not be made (and garbage collected) for each call.	
+		String rightOperand = "";
+		String leftOperand  = "";
+		//System.out.println("Expression to findAdjaventOperands() is " + expression
+		//                 + " with operatorOffset of " + operatorOffset);
+		// scan forward
+		int i = operatorOffset+1;
+		// System.out.println("forward scan is starting at " + i);
+		for (; i < expression.length(); i++)
+		{                                   
+		if ((expression.charAt(i) == '+')	  
+		|| (expression.charAt(i) == '-')	  
+		|| (expression.charAt(i) == '*')	   
+		|| (expression.charAt(i) == '/')	   
+		|| (expression.charAt(i) == '^')	   
+		|| (expression.charAt(i) == 'r'))	   
+		break;
+		}
+		op.nextOperatorOffset = i; // may be end-of-expression.
+		if (i == expression.length()) // didn't find a next operator in the above scan!
+		rightOperand = expression.substring(operatorOffset+1).trim();
+		if (i < expression.length()-1) // found an operator at i  
+		rightOperand = expression.substring(operatorOffset+1,i).trim();
+		if (i == expression.length()-1) // Woopsie! operator is last char  
+		throw new IllegalArgumentException("Expression (or sub-expression) ends with operator " 
+		             + expression.charAt(i));
+		if (rightOperand.startsWith("n")) // replace 'n' with '-'
+		rightOperand = "-" + rightOperand.substring(1);
+		if (rightOperand.startsWith("-n")) // watch for unary...
+		rightOperand = rightOperand.substring(2);
+		try {
+		op.rightOperandValue = Double.parseDouble(rightOperand);
+		}
+		catch(NumberFormatException nfe)
+		{
+		throw new IllegalArgumentException("Operand " + rightOperand
+		          + " is not numeric.");
+		}
+		// now scan backwards (to the left)
+		i = operatorOffset-1;
+		// System.out.println("leftwards scan is starting at " + i);
+		for (; i >= 0; i--)
+		{                                   
+		if ((expression.charAt(i) == '+')	  
+		|| (expression.charAt(i) == '-')	  
+		|| (expression.charAt(i) == '*')	   
+		|| (expression.charAt(i) == '/')	   
+		|| (expression.charAt(i) == '^')	   
+		|| (expression.charAt(i) == 'r'))	   
+		break;
+		}
+		op.previousOperatorOffset = i; // may be beginning-of-expression (-1)
+		if (i > 0) // found an operator at i
+		leftOperand = expression.substring(i+1, operatorOffset).trim();
+		if (i < 0) // didn't find a previous operator in the above scan!
+		leftOperand = expression.substring(0, operatorOffset).trim();
+		if (i == 0) // oopsie! operator is 1st char
+		throw new IllegalArgumentException("Expression (or sub-expression) starts with operator " 
+		            + expression.charAt(0));
+		if (leftOperand.startsWith("n")) // replace 'n' with '-'
+		leftOperand = "-" + leftOperand.substring(1);
+		if (leftOperand.startsWith("-n")) // watch for unary...
+		leftOperand = leftOperand.substring(2);
+		try {
+		op.leftOperandValue = Double.parseDouble(leftOperand);
+		}
+		catch(NumberFormatException nfe)
+		{
+		throw new IllegalArgumentException("Operand " + leftOperand
+		           + " is not numeric.");
+		}
+		//System.out.println("leftOperandValue is "  + op.leftOperandValue
+		//		         + ", rightOperandValue is " + op.rightOperandValue
+		//		         + ", operator is " + expression.charAt(operatorOffset));
+		return op;
+	}
+    
+    class OperandPair // INNER CLASS ! (An object to hold 
+    {           //                multiple return values.
+	  int    nextOperatorOffset;     //(or expression end)
+	  int    previousOperatorOffset; //(or expression start)
+	  double rightOperandValue;
+	  double leftOperandValue;
+    }           // end of inner class
+    
+    private double calculateSimpleExpression(double leftOperand, char operator, double rightOperand)
+    		throws IllegalArgumentException
+	{
+	//System.out.println("In calculateResult() leftOperand is " + firstOperand
+	//		         + ", operator is " + operator
+	//                 + ", rightOperand is " + secondOperand);	
+		switch(operator)
+		{
+			case '+': return leftOperand + rightOperand; 
+			case '-': return leftOperand - rightOperand; 
+			case '*': return leftOperand * rightOperand; 
+			case '/': return leftOperand / rightOperand; 
+			case '^': return Math.pow(leftOperand, rightOperand);
+			case 'r': return Math.pow(leftOperand, (1.0/rightOperand));
+			default : throw new IllegalArgumentException("INTERNAL ERROR: Operator " + operator + " not recognized in switch.");
+		}          
+	}
+    
+    // Used to test if a String is a double value.
+    boolean isDouble(String str) {
+        try {
+            Double.parseDouble(str);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+	
+	/********************************************************
+	 * GRAPHING CALCULATOR INTERFACE FUNCTION
+	 ********************************************************/
+	@Override
+	public void drawGraph(String expression, String xStart, String increment)
+			throws IllegalArgumentException {
+		// TODO Implement function for graphing calculator.
+		
+	}
+	
+	/*************************************************************
+	 * HELPER METHODS FOR GRAPHING CALCULATOR
+	 *************************************************************/
 }

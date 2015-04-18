@@ -26,7 +26,7 @@ JLabel errorLabelField = new JLabel(); // displays errors here
 JTextField inputArea = new JTextField("Choose calculator mode FIRST, then enter input");	// numerical input here
 JLabel empty = new JLabel();
 JLabel ForX = new JLabel("for X = ", SwingConstants.RIGHT);
-JLabel ToX = new JLabel("to X = ", SwingConstants.RIGHT);
+JLabel ToX = new JLabel("X increment = ", SwingConstants.RIGHT);
 JTextField forX = new JTextField("");
 JTextField toX = new JTextField("");
 JTextArea totalDisplay = new JTextArea(); // displays total

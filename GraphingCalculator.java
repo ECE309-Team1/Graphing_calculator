@@ -141,7 +141,7 @@ private OperandPair  op = new OperandPair();
 	 * EXPRESSION CALCULATOR INTERFACE FUNCTION
 	 ********************************************************/
 	@Override
-	public String calculate(String Expression, String x, String increment)
+	public String calculate(String Expression, String x)
 			throws IllegalArgumentException {
 	    
 	    Double ans = null;	
@@ -341,7 +341,7 @@ private OperandPair  op = new OperandPair();
 					String x = forX.getText();
 					String xIncrement =xIncrementField.getText();
 							
-					total = calculate(input, x, xIncrement);
+					total = calculate(input, x);
 					
 					// Update the total after successful parsing
 					totalDisplay.setText(total);

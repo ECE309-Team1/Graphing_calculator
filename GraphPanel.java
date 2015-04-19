@@ -21,6 +21,7 @@ public class GraphPanel extends JPanel implements MouseListener {
 
     JFrame miniXYdisplayWindow = new JFrame("mini");
     String expression;
+    Calculator calculatorProgram;
     
 	public GraphPanel (String expression, // CONSTRUCTOR
             double[]   xValues,
@@ -31,6 +32,7 @@ public class GraphPanel extends JPanel implements MouseListener {
 		this.xValues = xValues;
 		this.yValues = yValues;
 		this.expression = expression;
+		this.calculatorProgram = calculatorProgram;
 		
 		// To-do for this constructor method:
 		// 1 Verify arrays are same size
@@ -74,7 +76,7 @@ public class GraphPanel extends JPanel implements MouseListener {
 		String xValueString = String.valueOf(xValue);
 		xTextField.setText("X = " + xValueString);
 		
-		String yValueString = Calculator.calculate(expression,xValueString); 
+		String yValueString = calculatorProgram.calculate(expression,xValueString); 
 		yTextField.setText("Y = " + yValueString);
 		
 		// show mini x,y display window

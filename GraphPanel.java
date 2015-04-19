@@ -71,7 +71,7 @@ public class GraphPanel extends JPanel implements MouseListener {
 		addMouseListener(this);
         
         // 6 Calculate Y scale values (and save them) 
-	      // Let's assume we have 25 pixel margins on all four sides
+	    // Let's assume we have 25 pixel margins on all four sides
         // The x and y axis will be located along the left and bottom margins
         // NOTE: Assuming x and y array values are in ascending order
      
@@ -79,6 +79,8 @@ public class GraphPanel extends JPanel implements MouseListener {
 		// 7 Build miniXYdisplayWindow (reuse for each mouse click!)
 		miniXYdisplayWindow.getContentPane().add(xTextField);
 	    miniXYdisplayWindow.getContentPane().add(yTextField);
+	    miniXYdisplayWindow.getContentPane().add(this);
+	    miniXYdisplayWindow.setSize(300,300);
 		miniXYdisplayWindow.setVisible(true);
 	}
 	
@@ -112,7 +114,6 @@ public class GraphPanel extends JPanel implements MouseListener {
 		
 		String yValueString = calculatorProgram.calculate(expression,xValueString); 
 		yTextField.setText("Y = " + yValueString);
-		
 		// show mini x,y display window
 		miniXYdisplayWindow.setLocation(me.getX(), me.getY());
 		miniXYdisplayWindow.setVisible(true); 

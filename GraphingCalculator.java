@@ -227,7 +227,8 @@ private OperandPair  op = new OperandPair();
 		}		
 	}
 
-	//TODO: SHould this be an override?
+	//TODO: SHould this be an override? - Yes it has to be overridden
+	@Override
 	public void actionPerformed(ActionEvent ae) 
 	{
 		// clear the label field

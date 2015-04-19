@@ -147,11 +147,6 @@ private OperandPair  op = new OperandPair();
 		//test cases
 		if(Expression.contains("X"))
 			Expression = Expression.replaceAll("X", "x");
-		if(Expression.contains("x"))
-		{
-			if(forX.getText().isEmpty())
-				throw new IllegalArgumentException("Please specify a value for x");
-		}
 		
 		try
 		{
@@ -226,7 +221,6 @@ private OperandPair  op = new OperandPair();
 		}		
 	}
 
-	//TODO: SHould this be an override? - Yes it has to be overridden
 	@Override
 	public void actionPerformed(ActionEvent ae) 
 	{
@@ -338,7 +332,11 @@ private OperandPair  op = new OperandPair();
 					else
 						input = inputArea.getText();
 					
-					String x = forX.getText();
+					String x;
+					if(forX.getText().isEmpty())
+						throw new IllegalArgumentException("Enter a value for x.");
+					else
+						x = forX.getText();
 							
 					total = calculate(input, x);
 					
@@ -408,8 +406,7 @@ private OperandPair  op = new OperandPair();
 				
 			// clear the input field.
 			inputArea.setText("");
-		}
-		
+		}	
 	}
 	
 	
@@ -506,7 +503,7 @@ private OperandPair  op = new OperandPair();
             sb.deleteCharAt(exp.length()-1);
         }
 
-        String acc = "-+*/r^x)( pie.";
+        String acc = "-+*/r^x)( piePIE.";
         //iterate through rest
         for(int i=1; i<sb.length()-1 ; i++)
         {
@@ -792,7 +789,7 @@ private OperandPair  op = new OperandPair();
 		}
 		catch(NumberFormatException nfe)
 		{
-			throw new IllegalArgumentException("Enter a number.");
+			throw new IllegalArgumentException("Enter a proper number.");
 		}
 		
 		int j; double xEnd = tempX + 11*inc;

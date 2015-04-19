@@ -3,7 +3,9 @@ import java.awt.LayoutManager;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
+import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 
 
 public class GraphPanel extends JPanel implements MouseListener {
@@ -14,7 +16,13 @@ public class GraphPanel extends JPanel implements MouseListener {
 	private double[] xValues;
 	private double[] yValues;
 
-	public GraphPanel (String     expression, // CONSTRUCTOR
+    JTextField xTextField = new JTextField("X");
+    JTextField yTextField = new JTextField("Y");
+
+    JFrame miniXYdisplayWindow = new JFrame("mini");
+    String expression;
+    
+	public GraphPanel (String expression, // CONSTRUCTOR
             double[]   xValues,
             double[]   yValues,
             Calculator calculatorProgram)
@@ -22,6 +30,8 @@ public class GraphPanel extends JPanel implements MouseListener {
 	{
 		this.xValues = xValues;
 		this.yValues = yValues;
+		this.expression = expression;
+		
 		// To-do for this constructor method:
 		// 1 Verify arrays are same size
 		// 2 Verify x increment is positive
@@ -30,6 +40,10 @@ public class GraphPanel extends JPanel implements MouseListener {
 		// 5 Register with the panel as MouseListener
 		// 6 Calculate Y scale values (and save them) 
 		// 7 Build miniXYdisplayWindow (reuse for each mouse click!)
+
+	
+
+        
 	}
 	
 	@Override
@@ -60,7 +74,7 @@ public class GraphPanel extends JPanel implements MouseListener {
 		String xValueString = String.valueOf(xValue);
 		xTextField.setText("X = " + xValueString);
 		
-		String yValueString = calculator.calculate(expression,xValueString); 
+		String yValueString = Calculator.calculate(expression,xValueString); 
 		yTextField.setText("Y = " + yValueString);
 		
 		// show mini x,y display window

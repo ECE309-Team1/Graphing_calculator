@@ -18,31 +18,33 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
 
-public class GraphingCalculator implements ActionListener, Grapher
+public class GraphingCalculator implements  ActionListener, Grapher
 {
 	// GUI declarations
-JFrame calcWindow = new JFrame();	
-JLabel errorLabelField = new JLabel(); // displays errors here
-JTextField inputArea = new JTextField("Choose calculator mode FIRST, then enter input");	// numerical input here
-JLabel empty = new JLabel();
-JLabel ForX = new JLabel("for X = ", SwingConstants.RIGHT);
-JLabel ToX = new JLabel("X increment = ", SwingConstants.RIGHT);
-JTextField forX = new JTextField("");
-JTextField toX = new JTextField("");
-JTextArea totalDisplay = new JTextArea(); // displays total
-JTextArea logDisplay = new JTextArea();
-ButtonGroup group = new ButtonGroup();
+JFrame       calcWindow      = new JFrame();	
+JLabel       errorLabelField = new JLabel(); // displays errors here
+JTextField   inputArea       = new JTextField("Choose calculator mode FIRST, then enter input");	// numerical input here
+JLabel       empty           = new JLabel();
+JLabel       ForX            = new JLabel("for X = ", SwingConstants.RIGHT);
+JLabel       ToX             = new JLabel("X increment = ", SwingConstants.RIGHT);
+JTextField   forX            = new JTextField("");
+JTextField   toX             = new JTextField("");
+JTextArea    totalDisplay    = new JTextArea(); // displays total
+JTextArea    logDisplay      = new JTextArea();
+ButtonGroup  group           = new ButtonGroup();
 JRadioButton accumulatorMode = new JRadioButton("Accumulator");
-JRadioButton expressionMode = new JRadioButton("Expression");
-JRadioButton testMode = new JRadioButton("Test");
-JRadioButton graphMode = new JRadioButton("Graph");    
-JButton clearButton = new JButton("Clear"); // clear button
-JScrollPane logScrollPane = new JScrollPane(logDisplay);
+JRadioButton expressionMode  = new JRadioButton("Expression");
+JRadioButton testMode        = new JRadioButton("Test");
+JRadioButton graphMode       = new JRadioButton("Graph");    
+JButton      clearButton     = new JButton("Clear"); // clear button
+JScrollPane  logScrollPane   = new JScrollPane(logDisplay);
 // Construct the Accumulating Calculator and that's it.
-JPanel topPanel = new JPanel();
-JPanel centerPanel = new JPanel();
-JPanel bottomPanel = new JPanel();
-String newLine = System.lineSeparator();
+JPanel       topPanel        = new JPanel();
+JPanel       centerPanel     = new JPanel();
+JPanel       bottomPanel     = new JPanel();
+JTextField   xIncrementField = new JTextField();
+
+String       newLine         = System.lineSeparator();
 boolean debug;
 int totalRight = 0;
 int totalWrong = 0;
@@ -139,10 +141,10 @@ private OperandPair  op = new OperandPair();
 	 * EXPRESSION CALCULATOR INTERFACE FUNCTION
 	 ********************************************************/
 	@Override
-	public String calculate(String Expression, String x)
+	public String calculate(String Expression, String x, String increment)
 			throws IllegalArgumentException {
-		Double ans = null;
-		
+	    
+	    Double ans = null;	
 		//test cases
 		if(Expression.contains("X"))
 			Expression = Expression.replaceAll("X", "x");
@@ -225,7 +227,7 @@ private OperandPair  op = new OperandPair();
 		}		
 	}
 
-	@Override
+	//TODO: SHould this be an override?
 	public void actionPerformed(ActionEvent ae) 
 	{
 		// clear the label field
@@ -337,8 +339,9 @@ private OperandPair  op = new OperandPair();
 						input = inputArea.getText();
 					
 					String x = forX.getText();
+					String xIncrement =xIncrementField.getText();
 							
-					total = calculate(input, x);
+					total = calculate(input, x, xIncrement);
 					
 					// Update the total after successful parsing
 					totalDisplay.setText(total);

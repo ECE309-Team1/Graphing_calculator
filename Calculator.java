@@ -1,6 +1,9 @@
 
 public interface Calculator extends Accumulator
 {
-public String calculate(String Expression, String x)
-       throws IllegalArgumentException;
+public static String calculate(String Expression, String x)
+       throws IllegalArgumentException {
+    // TODO Auto-generated method stub
+    return null;
+}
 }

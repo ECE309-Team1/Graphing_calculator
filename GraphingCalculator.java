@@ -42,7 +42,6 @@ JScrollPane  logScrollPane   = new JScrollPane(logDisplay);
 JPanel       topPanel        = new JPanel();
 JPanel       centerPanel     = new JPanel();
 JPanel       bottomPanel     = new JPanel();
-JTextField   xIncrementField = new JTextField();
 
 String       newLine         = System.lineSeparator();
 boolean debug;
@@ -335,12 +334,11 @@ private OperandPair  op = new OperandPair();
 					
 					// Simple tests for input - (To avoid unnecessary Double.parse exceptions) 
 					if(inputArea.getText().equals(""))
-						input = "0";
+						throw new IllegalArgumentException("An expression has to be entered.");
 					else
 						input = inputArea.getText();
 					
 					String x = forX.getText();
-					String xIncrement =xIncrementField.getText();
 							
 					total = calculate(input, x);
 					
@@ -370,6 +368,38 @@ private OperandPair  op = new OperandPair();
 			 ***************************************************/
 			else if(graphMode.isSelected() == true)
 			{
+				try
+				{
+					String input = null;
+					
+					// Simple tests for input - (To avoid unnecessary Double.parse exceptions) 
+					if(inputArea.getText().equals(""))
+					{
+						throw new IllegalArgumentException("An expression has to be entered.");
+					}
+					
+					else
+						input = inputArea.getText();
+					
+					String fx = forX.getText();
+					String tx = toX.getText();
+					
+					drawGraph(input, fx, tx);
+					
+					inputArea.setText("");
+					totalDisplay.setText("");
+					toX.setText("");
+					toX.setEditable(true);
+					forX.setText("");
+					forX.setEditable(true);
+					
+				}
+				
+				catch(IllegalArgumentException e)
+				{
+					// If parse not successful, Update error message.
+					errorLabelField.setText(e.getMessage());
+				}
 			}
 			
 			else
@@ -751,10 +781,33 @@ private OperandPair  op = new OperandPair();
 	public void drawGraph(String expression, String xStart, String increment)
 			throws IllegalArgumentException {
 		// TODO Implement function for graphing calculator.
+		double[] xVals;
+		double[] yVals;
+		double inc, tempX;
 		
+		try
+		{
+			inc = Double.parseDouble(increment);
+			tempX = Double.parseDouble(xStart);
+		}
+		catch(NumberFormatException nfe)
+		{
+			throw new IllegalArgumentException("Enter a number.");
+		}
+		
+		int j; double xEnd = tempX + 11*inc;
+		if((xEnd < 0 && tempX < 0) || (xEnd > 0 && tempX > 0))
+			j = 10;
+		else
+			j = 11;
+		xVals = new double[j];
+		yVals = new double[j];
+		for (int i=0; i<j; i++) 
+		{
+			xVals[i] = tempX;
+			yVals[i] = Double.parseDouble(calculate(expression, String.valueOf(tempX))); // work?
+			tempX += inc;
+		}
+		GraphPanel gp = new GraphPanel(expression, xVals, yVals, this);
 	}
-	
-	/*************************************************************
-	 * HELPER METHODS FOR GRAPHING CALCULATOR
-	 *************************************************************/
 }

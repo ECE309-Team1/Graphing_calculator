@@ -91,6 +91,11 @@ public class GraphPanel extends JPanel implements MouseListener {
 
 		int windowWidth  = getWidth(); // call methods
 		int windowHeight = getHeight();// in JPanel!
+		int xIncrements  = windowWidth/xValues.length;
+		int yIncrements  = windowHeight/yValues.length;
+		int xScale = xIncrements;
+		int yScale = yIncrements;
+		
 		
 		// Let's assume we have 25 pixel margins on all four sides
 		// The x and y axis will be located along the left and bottom margins
@@ -103,7 +108,23 @@ public class GraphPanel extends JPanel implements MouseListener {
 
 		// 2 Do ALL drawing here in paint() 
 		g.drawLine(0, windowHeight - 25, windowWidth, windowHeight - 25); // Draw X-Axis
-		g.drawLine(25, 0, 25, windowHeight);//Draw Y-Axis
+		g.drawLine(25, 0, 25, windowHeight);						      //Draw Y-Axis
+		
+		//Draw Y-Axis
+		for(int i = 0; i < yValues.length; i++)
+		{
+			g.drawString("--", 25, yScale );
+			yScale += yIncrements;
+			
+		}
+		
+		//Draw X-Axis
+		for(int i = 0; i < xValues.length; i++)
+		{
+			g.drawString("|", xScale, windowHeight-25 );
+			xScale += xIncrements;
+		}
+		
 	}
 	
 	public void mousePressed(MouseEvent me) // show tiny x,y values window

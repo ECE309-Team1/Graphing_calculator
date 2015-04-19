@@ -2,8 +2,6 @@ import java.awt.Graphics;
 import java.awt.LayoutManager;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.math.BigDecimal;
-import java.math.MathContext;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -18,15 +16,16 @@ public class GraphPanel extends JPanel implements MouseListener {
 	private double[] xValues;
 	private double[] yValues;
 
-	static JPanel pane = new JPanel();
-    static JTextField xTextField = new JTextField("X");
-    static JTextField yTextField = new JTextField("Y");
-    static JFrame miniXYdisplayWindow = new JFrame("mini");
-    
+    JTextField xTextField = new JTextField("X");
+    JTextField yTextField = new JTextField("Y");
+
+    JFrame miniXYdisplayWindow = new JFrame("mini");
     String expression;
         
     
     Calculator calculatorProgram;
+    
+    
     
     //testing purposes only.
     public void main()
@@ -78,11 +77,11 @@ public class GraphPanel extends JPanel implements MouseListener {
      
 		
 		// 7 Build miniXYdisplayWindow (reuse for each mouse click!)
-		
-		pane.add(xTextField);
-	    pane.add(yTextField);
-	    miniXYdisplayWindow.getContentPane().add(pane, "Center");
-	    miniXYdisplayWindow.setSize(100,100);
+		miniXYdisplayWindow.getContentPane().add(xTextField);
+	    miniXYdisplayWindow.getContentPane().add(yTextField);
+	    miniXYdisplayWindow.getContentPane().add(this);
+	    miniXYdisplayWindow.setSize(300,300);
+		miniXYdisplayWindow.setVisible(true);
 	}
 	
 	@Override
@@ -92,8 +91,8 @@ public class GraphPanel extends JPanel implements MouseListener {
 
 		int windowWidth  = getWidth(); // call methods
 		int windowHeight = getHeight();// in JPanel!
-		int xIncrements  = windowWidth/xValues.length;
-		int yIncrements  = windowHeight/yValues.length;
+		int xIncrements  = (windowWidth -50)/xValues.length;
+		int yIncrements  = (windowHeight-25)/yValues.length;
 		int xScale = xIncrements;
 		int yScale = yIncrements;
 		
@@ -114,7 +113,7 @@ public class GraphPanel extends JPanel implements MouseListener {
 		//Draw Y-Axis
 		for(int i = 0; i < yValues.length; i++)
 		{
-			g.drawString("--", 25, yScale );
+			g.drawString("--", 25, yScale-25 );
 			yScale += yIncrements;
 			
 		}
@@ -122,7 +121,7 @@ public class GraphPanel extends JPanel implements MouseListener {
 		//Draw X-Axis
 		for(int i = 0; i < xValues.length; i++)
 		{
-			g.drawString("|", xScale, windowHeight-25 );
+			g.drawString("|", xScale+25, windowHeight-25 );
 			xScale += xIncrements;
 		}
 		
@@ -133,15 +132,10 @@ public class GraphPanel extends JPanel implements MouseListener {
 		// xTextField and yTextField are in the miniXYdisplayWindow
 		int xInPixels = me.getX();
 		double xValue = xInPixels * xPixelsToValueConversionFactor;
+		String xValueString = String.valueOf(xValue);
+		xTextField.setText("X = " + xValueString);
 		
-		BigDecimal  xBD = new BigDecimal(xValue,MathContext.DECIMAL64);//set precision to 16 digits
-		xBD = xBD.setScale(2,BigDecimal.ROUND_UP);//scale (2) is # of digits to right of decimal point.
-		String xString = xBD.toPlainString();// no exponents
-		
-		xTextField.setText("X = " + xString);
-		
-		String yValueString = calculatorProgram.calculate(expression,xString);
-		
+		String yValueString = calculatorProgram.calculate(expression,xValueString); 
 		yTextField.setText("Y = " + yValueString);
 		// show mini x,y display window
 		miniXYdisplayWindow.setLocation(me.getX(), me.getY());

@@ -21,7 +21,17 @@ public class GraphPanel extends JPanel implements MouseListener {
 
     JFrame miniXYdisplayWindow = new JFrame("mini");
     String expression;
+        
+    
     Calculator calculatorProgram;
+    
+    
+    
+    //testing purposes only.
+    public void main()
+    {
+        
+    }
     
 	public GraphPanel (String expression, // CONSTRUCTOR
             double[]   xValues,
@@ -29,23 +39,34 @@ public class GraphPanel extends JPanel implements MouseListener {
             Calculator calculatorProgram)
             throws IllegalArgumentException
 	{
-		this.xValues = xValues;
-		this.yValues = yValues;
-		this.expression = expression;
-		this.calculatorProgram = calculatorProgram;
 		
 		// To-do for this constructor method:
 		// 1 Verify arrays are same size
+		if(xValues.length != yValues.length) 
+		    throw new IllegalArgumentException("X and Y arrays wrong length");
+	        
+		    this.xValues = xValues;
+	        this.yValues = yValues;
 		// 2 Verify x increment is positive
+	        for(int i=1; i < xValues.length; i++){
+	            if ((xValues[i] - xValues[i-1]) <= 0)
+	            {
+	                throw new IllegalArgumentException("Negative or overlapping x increments");
+	            }
+	        }
+	        
 		// 3 Save Calculator address for call back
+        this.calculatorProgram = calculatorProgram;
+
 		// 4 Save expression for call back
+        this.expression = expression;
+
 		// 5 Register with the panel as MouseListener
-		// 6 Calculate Y scale values (and save them) 
+		addMouseListener(this);
+        
+        // 6 Calculate Y scale values (and save them) 
 		// 7 Build miniXYdisplayWindow (reuse for each mouse click!)
 
-	
-
-        
 	}
 	
 	@Override

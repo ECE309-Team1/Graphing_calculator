@@ -110,7 +110,12 @@ public class GraphPanel extends JPanel implements MouseListener {
 	public void mousePressed(MouseEvent me) // show tiny x,y values window
 	{
 		// xTextField and yTextField are in the miniXYdisplayWindow
-		int xInPixels = me.getX();
+		int xInPixels = me.getX()-25;
+		
+		// Test to make sure x point is within the graph
+		if(xInPixels < 0 || xInPixels > (getWidth()-25*2))
+			return;
+		
 		double xValue = xInPixels * xPixelsToValueConversionFactor;
 		
 		BigDecimal  xBD = new BigDecimal(xValue,MathContext.DECIMAL64);//set precision to 16 digits

@@ -106,7 +106,9 @@ public class GraphPanel extends JPanel implements MouseListener {
 		yPixelsToValueConversionFactor = 1/yValuetoPixelsConversionFactor;
 		
 
-		// 2 Do ALL drawing here in paint() 		
+		// 2 Do ALL drawing here in paint() 
+		g.drawLine(0, windowHeight - 25, windowWidth, windowHeight - 25); // Draw X-Axis
+		g.drawLine(25, 0, 25, windowHeight);//Draw Y-Axis
 	}
 	
 	public void mousePressed(MouseEvent me) // show tiny x,y values window

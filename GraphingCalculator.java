@@ -809,5 +809,10 @@ private OperandPair  op = new OperandPair();
 			tempX += inc;
 		}
 		GraphPanel gp = new GraphPanel(expression, xVals, yVals, this);
+		
+		JFrame graphWindow = new JFrame();
+		graphWindow.getContentPane().add(gp, "Center");
+		graphWindow.setSize(500,500);
+		graphWindow.setVisible(true);
 	}
 }

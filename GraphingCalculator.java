@@ -332,11 +332,14 @@ private OperandPair  op = new OperandPair();
 					else
 						input = inputArea.getText();
 					
-					String x;
-					if(forX.getText().isEmpty())
-						throw new IllegalArgumentException("Enter a value for x.");
-					else
-						x = forX.getText();
+					String x = null;
+					if(input.contains("X") || input.contains("x"))
+					{
+						if(forX.getText().isEmpty())
+							throw new IllegalArgumentException("Enter a value for x.");
+						else
+							x = forX.getText();
+					}
 							
 					total = calculate(input, x);
 					
@@ -811,5 +814,6 @@ private OperandPair  op = new OperandPair();
 		graphWindow.getContentPane().add(gp, "Center");
 		graphWindow.setSize(500,500);
 		graphWindow.setVisible(true);
+		graphWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
 }

@@ -91,8 +91,9 @@ public class GraphPanel extends JPanel implements MouseListener {
 		int xIncrements  = (windowWidth -50)/(xValues.length-1);
 		int yIncrements  = (windowHeight-50)/(yValues.length-1);
 		int xScale = 25;
+		int previousXPixel = 25;
 		int yScale = windowHeight-25;
-		
+		int previousYPixel = windowHeight-25;
 		
 		// Let's assume we have 25 pixel margins on all four sides
 		// The x and y axis will be located along the left and bottom margins
@@ -116,14 +117,24 @@ public class GraphPanel extends JPanel implements MouseListener {
 			yScale -= yIncrements;
 			
 		}
-		
+		yScale = windowHeight-25;
 		//Draw X-Axis tics
 		for(int i = 0; i < xValues.length; i++)
 		{
+			int yValToPixel = (int) (yValues[i] * (yValuetoPixelsConversionFactor));
+			int yToPlot = yScale-yValToPixel;
 			//						x		y
 			g.drawString("|", xScale, windowHeight-25 );
 			g.drawString(Double.toString(xValues[i]),xScale-7,windowHeight-8);
+			g.drawOval(xScale, yToPlot, 4, 4);
+			if(i>0)
+			{
+				g.drawLine(previousXPixel, previousYPixel, xScale, yToPlot);
+			}
+			previousXPixel = xScale;
+			previousYPixel = yToPlot;
 			xScale += xIncrements;
+			
 		}
 		
 		

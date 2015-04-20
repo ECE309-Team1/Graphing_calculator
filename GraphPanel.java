@@ -101,8 +101,8 @@ public class GraphPanel extends JPanel implements MouseListener {
 		// Let's assume we have 25 pixel margins on all four sides
 		// The x and y axis will be located along the left and bottom margins
 		// NOTE: Assuming x and y array values are in ascending order
-		xValuetoPixelsConversionFactor = (windowWidth - 25*2)/(Math.abs(xValues[0]) + Math.abs(xValues[xValues.length-1]));
-		yValuetoPixelsConversionFactor = (windowHeight - 25*2)/(Math.abs(yValues[0]) + Math.abs(yValues[xValues.length-1]));
+		xValuetoPixelsConversionFactor = (windowWidth - 25*2)/(Math.abs(xValues[xValues.length-1]-xValues[0]));
+		yValuetoPixelsConversionFactor = (windowHeight - 25*2)/(Math.abs(yValues[xValues.length-1]-yValues[0]));
 		xPixelsToValueConversionFactor = 1/xValuetoPixelsConversionFactor;
 		yPixelsToValueConversionFactor = 1/yValuetoPixelsConversionFactor;
 		
@@ -139,7 +139,7 @@ public class GraphPanel extends JPanel implements MouseListener {
 		if(xInPixels < 0 || xInPixels > (getWidth()-25*2))
 			return;
 		
-		double xValue = xInPixels * xPixelsToValueConversionFactor;
+		double xValue = (xInPixels*xPixelsToValueConversionFactor)+xValues[0] ;
 		
 		BigDecimal  xBD = new BigDecimal(xValue,MathContext.DECIMAL64);//set precision to 16 digits
 		xBD = xBD.setScale(2,BigDecimal.ROUND_UP);//scale (2) is # of digits to right of decimal point.

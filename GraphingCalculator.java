@@ -102,7 +102,7 @@ private OperandPair  op = new OperandPair();
 		calcWindow.getContentPane().add(centerPanel, "Center");
 		calcWindow.getContentPane().add(bottomPanel, "South");
 		
-		calcWindow.setTitle("Expression Calculator");
+		calcWindow.setTitle("Graphing Calculator");
 		
 		totalDisplay.setEditable(false);
 		logDisplay.setEditable(false);
@@ -813,7 +813,8 @@ private OperandPair  op = new OperandPair();
 		JFrame graphWindow = new JFrame();
 		graphWindow.getContentPane().add(gp, "Center");
 		graphWindow.setSize(500,500);
+		graphWindow.setTitle("y = " + expression + " Click on the graph line to show x,y values at that point.");
 		graphWindow.setVisible(true);
-		graphWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		graphWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 	}
 }

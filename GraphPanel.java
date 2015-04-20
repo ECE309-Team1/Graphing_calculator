@@ -92,8 +92,8 @@ public class GraphPanel extends JPanel implements MouseListener {
 
 		int windowWidth  = getWidth(); // call methods
 		int windowHeight = getHeight();// in JPanel!
-		int xIncrements  = (windowWidth -50)/xValues.length;
-		int yIncrements  = (windowHeight-50)/yValues.length;
+		int xIncrements  = (windowWidth -50)/(xValues.length-1);
+		int yIncrements  = (windowHeight-50)/(yValues.length-1);
 		int xScale = 25;
 		int yScale = windowHeight-25;
 		

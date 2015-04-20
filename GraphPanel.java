@@ -16,6 +16,7 @@ public class GraphPanel extends JPanel implements MouseListener {
 	private double xPixelsToValueConversionFactor;
 	private double[] xValues;
 	private double[] yValues;
+	private double yValueIncrement;
 
 	static JPanel pane = new JPanel();
     static JTextField xTextField = new JTextField("X");
@@ -70,8 +71,10 @@ public class GraphPanel extends JPanel implements MouseListener {
 		// 5 Register with the panel as MouseListener
 		addMouseListener(this);
         
-        // 6 Calculate Y scale values (and save them) 
-     
+        // 6 Calculate Y scale values (and save them)
+		double minY = min(yValues);
+		double maxY = max(yValues);
+		yValueIncrement = (maxY-minY)/(yValues.length-1);
 		
 		// 7 Build miniXYdisplayWindow (reuse for each mouse click!)
 		
@@ -94,12 +97,13 @@ public class GraphPanel extends JPanel implements MouseListener {
 		int previousXPixel = 25;
 		int yScale = windowHeight-25;
 		int previousYPixel = windowHeight-25;
+		double yStart = min(yValues);
 		
 		// Let's assume we have 25 pixel margins on all four sides
 		// The x and y axis will be located along the left and bottom margins
 		// NOTE: Assuming x and y array values are in ascending order
 		xValuetoPixelsConversionFactor = (windowWidth - 25*2)/(Math.abs(xValues[xValues.length-1]-xValues[0]));
-		yValuetoPixelsConversionFactor = (windowHeight - 25*2)/(Math.abs(yValues[xValues.length-1]-yValues[0]));
+		yValuetoPixelsConversionFactor = (windowHeight - 25*2)/(Math.abs(max(yValues)-min(yValues)));
 		xPixelsToValueConversionFactor = 1/xValuetoPixelsConversionFactor;
 		
 
@@ -113,15 +117,18 @@ public class GraphPanel extends JPanel implements MouseListener {
 		{
 			//					x		y
 			g.drawString("__", 25, yScale);
-			g.drawString(Double.toString(yValues[i]), 2, yScale+7);
+			g.drawString(Double.toString(yStart), 2, yScale+7);
 			yScale -= yIncrements;
-			
+			yStart += yValueIncrement;
 		}
+		
+		// Resetting y to start point.
 		yScale = windowHeight-25;
+		
 		//Draw X-Axis tics
 		for(int i = 0; i < xValues.length; i++)
 		{
-			int yValToPixel = (int) (yValues[i] * (yValuetoPixelsConversionFactor));
+			int yValToPixel = (int) ((yValues[i] - min(yValues)) * (yValuetoPixelsConversionFactor));
 			int yToPlot = yScale-yValToPixel;
 			//						x		y
 			g.drawString("|", xScale, windowHeight-25 );
@@ -165,7 +172,7 @@ public class GraphPanel extends JPanel implements MouseListener {
 		Double yValue = Double.parseDouble(calculatorProgram.calculate(expression, xString));
 		BigDecimal  yBD = new BigDecimal(yValue,MathContext.DECIMAL64);//set precision to 16 digits
 		yBD = yBD.setScale(2,BigDecimal.ROUND_UP);//scale (2) is # of digits to right of decimal point.
-		String yString = xBD.toPlainString();// no exponents
+		String yString = yBD.toPlainString();// no exponents
 		
 		yTextField.setText("Y = " + yString);
 		
@@ -183,4 +190,24 @@ public class GraphPanel extends JPanel implements MouseListener {
 	public void mouseClicked(MouseEvent me){} // take no action
 	public void mouseEntered(MouseEvent me){} // on these
 	public void mouseExited(MouseEvent  me){} // window events
+	
+	private static double min(double[] array) {
+        double min = array[0];
+        for (int i = 1; i < array.length; i++) {
+            if (array[i] < min) {
+                min = array[i];
+            }
+        }
+        return min;
+    }
+	
+	private static double max(double[] array) {
+        double max = array[0];
+        for (int i = 1; i < array.length; i++) {
+            if (array[i] > max) {
+                max = array[i];
+            }
+        }
+        return max;
+    }
 }

@@ -14,7 +14,6 @@ public class GraphPanel extends JPanel implements MouseListener {
 	private double xValuetoPixelsConversionFactor;
 	private double yValuetoPixelsConversionFactor;
 	private double xPixelsToValueConversionFactor;
-	private double yPixelsToValueConversionFactor;
 	private double[] xValues;
 	private double[] yValues;
 
@@ -72,9 +71,6 @@ public class GraphPanel extends JPanel implements MouseListener {
 		addMouseListener(this);
         
         // 6 Calculate Y scale values (and save them) 
-	    // Let's assume we have 25 pixel margins on all four sides
-        // The x and y axis will be located along the left and bottom margins
-        // NOTE: Assuming x and y array values are in ascending order
      
 		
 		// 7 Build miniXYdisplayWindow (reuse for each mouse click!)
@@ -104,14 +100,13 @@ public class GraphPanel extends JPanel implements MouseListener {
 		xValuetoPixelsConversionFactor = (windowWidth - 25*2)/(Math.abs(xValues[xValues.length-1]-xValues[0]));
 		yValuetoPixelsConversionFactor = (windowHeight - 25*2)/(Math.abs(yValues[xValues.length-1]-yValues[0]));
 		xPixelsToValueConversionFactor = 1/xValuetoPixelsConversionFactor;
-		yPixelsToValueConversionFactor = 1/yValuetoPixelsConversionFactor;
 		
 
 		// 2 Do ALL drawing here in paint() 
 		g.drawLine(0, windowHeight - 25, windowWidth, windowHeight - 25); // Draw X-Axis
 		g.drawLine(25, 0, 25, windowHeight);						      //Draw Y-Axis
 		
-		//Draw Y-Axis
+		//Draw Y-Axis tics
 		for(int i = 0; i < yValues.length; i++)
 		{
 			//					x		y
@@ -120,13 +115,17 @@ public class GraphPanel extends JPanel implements MouseListener {
 			
 		}
 		
-		//Draw X-Axis
+		//Draw X-Axis tics
 		for(int i = 0; i < xValues.length; i++)
 		{
 			//						x		y
 			g.drawString("|", xScale, windowHeight-25 );
 			xScale += xIncrements;
 		}
+		
+		// TODO: 1) Number the axes.
+		// 2) plot the points.
+		// 3) Connect the points.
 		
 	}
 	
@@ -141,15 +140,21 @@ public class GraphPanel extends JPanel implements MouseListener {
 		
 		double xValue = (xInPixels*xPixelsToValueConversionFactor)+xValues[0] ;
 		
+		// Round x value to 2 decimal places.
 		BigDecimal  xBD = new BigDecimal(xValue,MathContext.DECIMAL64);//set precision to 16 digits
 		xBD = xBD.setScale(2,BigDecimal.ROUND_UP);//scale (2) is # of digits to right of decimal point.
 		String xString = xBD.toPlainString();// no exponents
 		
 		xTextField.setText("X = " + xString);
 		
-		String yValueString = calculatorProgram.calculate(expression,xString);
+		// Round y value to 2 decimal places.
+		Double yValue = Double.parseDouble(calculatorProgram.calculate(expression, xString));
+		BigDecimal  yBD = new BigDecimal(yValue,MathContext.DECIMAL64);//set precision to 16 digits
+		yBD = yBD.setScale(2,BigDecimal.ROUND_UP);//scale (2) is # of digits to right of decimal point.
+		String yString = xBD.toPlainString();// no exponents
 		
-		yTextField.setText("Y = " + yValueString);
+		yTextField.setText("Y = " + yString);
+		
 		// show mini x,y display window
 		miniXYdisplayWindow.setLocation(me.getX(), me.getY());
 		miniXYdisplayWindow.setVisible(true); 

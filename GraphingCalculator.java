@@ -372,22 +372,27 @@ private OperandPair  op = new OperandPair();
 				try
 				{
 					String input = null;
+					String fx = null;
+					String tx = null;
 					
 					// Simple tests for input - (To avoid unnecessary Double.parse exceptions) 
 					if(inputArea.getText().equals(""))
-					{
 						throw new IllegalArgumentException("An expression has to be entered.");
-					}
-					
 					else
 						input = inputArea.getText();
 					
-					String fx = forX.getText();
-					String tx = toX.getText();
+					if(forX.getText().equals(""))
+						throw new IllegalArgumentException("Enter a starting value for x.");
+					else
+						fx = forX.getText();
+					
+					if(toX.getText().equals(""))
+						throw new IllegalArgumentException("Enter an increment value for x.");
+					else
+						tx = toX.getText();
 					
 					drawGraph(input, fx, tx);
 					
-					inputArea.setText("");
 					totalDisplay.setText("");
 					toX.setText("");
 					toX.setEditable(true);
@@ -586,7 +591,6 @@ private OperandPair  op = new OperandPair();
     		int n = exp.substring(0,m).lastIndexOf('(');
     		
     		String toSend = exp.substring(n+1, m);
-    		// To be tested.
     		String result = Double.toString(evaluateComplexExpression(toSend));
     		exp = exp.replace(exp.substring(n, m+1), result);
     		if(debug)
@@ -606,6 +610,8 @@ private OperandPair  op = new OperandPair();
 	   int    operatorOffset,operator1Offset,operator2Offset;
 	   double result = 0;
 	   char[] operators = {'^','r','*','/','+','-'};//in priority sequence
+	   
+	   expression = replaceUnary(expression);
 	   
 	   for (int i = 0; i < operators.length; i = i+2)
 	       {
@@ -773,6 +779,100 @@ private OperandPair  op = new OperandPair();
             return false;
         }
     }
+    
+    private String replaceUnary(String expression)
+            throws IllegalArgumentException
+	{
+		// Assumptions:
+		// 1.	the expression passed in does NOT contain	
+		//    any parentheses.
+		// 2. the expression may be a simple expression.
+		//    (a portion of an expression between parentheses)
+		// 3. the expression may contain negative unary operators.
+		//    (positive unary operators are not allowed)
+		// 4. the expression is trim()ed.
+		//	
+		// GET RID OF THE PESKY UNARY OPERATORS
+		// Java uses "overloaded operators", where the symbol's
+		// meaning is determined by it's context. The + sign
+		// means <em>add</em> in a math environment and
+		// <em>concatenate</em> in a character environment.
+		// The overloaded '-' operator would complicate our 
+		// parsing because it is used for both <em>subtract</em>
+		// and <em>negate</em> in the same mathematical environment.
+		// So I propose we substitute another character 'n' for
+		// negative unary operators until the operands are 
+		// identified. Later, as the operand is being converted
+		// from String to double, if (operand.startsWith("n")) 
+		// we can remove the 'n' char and negate the operand value.
+		//	
+		// To spot the negative unary operators, the algorith is:
+		// a. scan for operators, remembering the offset of the
+		//    last operator as well as the current operator.
+		//    (do not include '(' and ')' in the operator list.)
+		// b. when an operator is found, see if there is an operand
+		//    between this and the last operator. (If NOT, the
+		//    current operator is either a negative unary operator
+		//	or a syntax error).
+		//If there is no operand between the last two operators:
+		// c. throw a "missing operand" exception if the current
+		//    operator is not '-'	
+		// d. throw an "missing operand" exception if the current
+		//    '-' operator is followed by a space.
+		//At this point, the current operator is a negative unary.	
+		// e. so replace the current '-' operator with 'n'.
+			
+			
+		int    lastOperatorOffset = -1;
+		String lastOperator = "beginning of expression";
+		char   operator;
+		String operand;	   
+		int    i;
+		if (expression.startsWith("-"))
+			  expression.replaceFirst("-","n");
+		for (i=0; i < expression.length(); i++)
+		   {
+		   if ((expression.charAt(i) == '+')	    
+		    || (expression.charAt(i) == '-')	    
+		    || (expression.charAt(i) == '*')	   
+		    || (expression.charAt(i) == '/')	   
+		    || (expression.charAt(i) == '^')	   
+		    || (expression.charAt(i) == 'r'))	   
+		      {
+		 	 operator= expression.charAt(i); 
+		      operand = expression.substring(lastOperatorOffset+1,i).trim();
+		      if (operand.length() == 0)//There IS NO operand!
+		         {		  
+		         if (expression.charAt(i)!='-')// and this is not a unary operator
+		             throw new IllegalArgumentException("Missing operand between " 
+		                     + lastOperator + " and "  
+		                     + expression.charAt(i));
+		         // an operator is at the end of the expression
+		         if ((i+1) == expression.length())
+		             throw new IllegalArgumentException("Missing operand following " 
+		                     + expression.charAt(i));
+		         // if '-' is followed by a space, it's not unary
+		         if (expression.charAt(i+1) == ' ')
+		             throw new IllegalArgumentException("Missing operand between " 
+		                     + lastOperator + " and "  
+		                     + expression.charAt(i));
+		        	//At this point we have a unary!Sub 'n' for '-'
+		         expression = expression.substring(0,i) // up to unary
+		                    + "n" //substitute 'n' for '-'
+		                    + expression.substring(i+1);// following unary
+		         // System.out.println("Expression with unary replaced = " + expression);
+		         } // end of if no operand
+		      lastOperatorOffset = i;
+		      char[] chars = new char[1];
+		      chars[0]     = operator;
+		      lastOperator = new String(chars);  
+		      } // end of operator hit
+		   } // end of expression search
+		if (lastOperatorOffset == expression.length()-1)
+			  throw new IllegalArgumentException("Expression cannot end with an operator.");
+		// At this point, any unary '-' are replaced with 'n'
+		return expression;
+	}
 	
 	/********************************************************
 	 * GRAPHING CALCULATOR INTERFACE FUNCTION

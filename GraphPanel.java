@@ -1,5 +1,4 @@
 import java.awt.Graphics;
-import java.awt.LayoutManager;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.math.BigDecimal;
@@ -11,7 +10,6 @@ import javax.swing.JTextField;
 
 
 public class GraphPanel extends JPanel implements MouseListener {
-	private double xValuetoPixelsConversionFactor;
 	private double yValuetoPixelsConversionFactor;
 	private double xPixelsToValueConversionFactor;
 	private double[] xValues;
@@ -27,18 +25,6 @@ public class GraphPanel extends JPanel implements MouseListener {
         
     
     Calculator calculatorProgram;
-    
-    //testing purposes only.
-    public void main()
-    {
-        Calculator cp = new GraphingCalculator();
-        
-        double[] xv = {1,2,3,4};
-        double[] yv = {2,4,6,8};
-        
-        GraphPanel gp = new GraphPanel("x*2", xv,yv,cp);
-        
-    }
     
 	public GraphPanel (String expression, // CONSTRUCTOR
             double[]   xValues,
@@ -102,22 +88,26 @@ public class GraphPanel extends JPanel implements MouseListener {
 		// Let's assume we have 25 pixel margins on all four sides
 		// The x and y axis will be located along the left and bottom margins
 		// NOTE: Assuming x and y array values are in ascending order
-		xValuetoPixelsConversionFactor = (windowWidth - 25*2)/(Math.abs(xValues[xValues.length-1]-xValues[0]));
 		yValuetoPixelsConversionFactor = (windowHeight - 25*2)/(Math.abs(max(yValues)-min(yValues)));
-		xPixelsToValueConversionFactor = 1/xValuetoPixelsConversionFactor;
+		xPixelsToValueConversionFactor = (Math.abs(xValues[xValues.length-1]-xValues[0]))/(windowWidth - 25*2);
 		
 
-		// 2 Do ALL drawing here in paint() 
-		g.drawLine(0, windowHeight - 25, windowWidth, windowHeight - 25); // Draw X-Axis
-		g.drawLine(25, 0, 25, windowHeight);						      //Draw Y-Axis
+		// 2 Do ALL drawing here in paint().
+		// Draw X-Axis and Y-Axis.
+		g.drawLine(0, windowHeight - 25, windowWidth, windowHeight - 25); 
+		g.drawLine(25, 0, 25, windowHeight);
 		
-		//Draw Y-Axis tics
-		// TODO: 1) Number the axes.
 		for(int i = 0; i < yValues.length; i++)
 		{
-			//					x		y
+			// Draw tics on the y-axis.
 			g.drawString("__", 25, yScale);
-			g.drawString(Double.toString(yStart), 2, yScale+7);
+			// Number the y axis.
+			// Round y value to 2 decimal places.
+			BigDecimal  y_BD = new BigDecimal(yStart ,MathContext.DECIMAL64);//set precision to 16 digits
+			y_BD = y_BD.setScale(2,BigDecimal.ROUND_UP);//scale (2) is # of digits to right of decimal point.
+			String yString = y_BD.toPlainString();// no exponents
+			g.drawString(yString, 2, yScale+7);
+			
 			yScale -= yIncrements;
 			yStart += yValueIncrement;
 		}
@@ -125,29 +115,32 @@ public class GraphPanel extends JPanel implements MouseListener {
 		// Resetting y to start point.
 		yScale = windowHeight-25;
 		
-		//Draw X-Axis tics
 		for(int i = 0; i < xValues.length; i++)
 		{
+			// Convert value to pixel
 			int yValToPixel = (int) ((yValues[i] - min(yValues)) * (yValuetoPixelsConversionFactor));
 			int yToPlot = yScale-yValToPixel;
-			//						x		y
+
+			// Draw tic marks for x axis.
 			g.drawString("|", xScale, windowHeight-25 );
-			g.drawString(Double.toString(xValues[i]),xScale-7,windowHeight-8);
+			
+			// Number the x axis.
+			// Round x value to 2 decimal places.
+			BigDecimal  xBD = new BigDecimal(xValues[i],MathContext.DECIMAL64);//set precision to 16 digits
+			xBD = xBD.setScale(2,BigDecimal.ROUND_UP);//scale (2) is # of digits to right of decimal point.
+			String xString = xBD.toPlainString();// no exponents
+			g.drawString(xString,xScale-7,windowHeight-8);
+			
+			// Plot the points
 			g.drawOval(xScale, yToPlot, 4, 4);
-			if(i>0)
-			{
-				g.drawLine(previousXPixel, previousYPixel, xScale, yToPlot);
-			}
+			
+			// Connect the points
+			g.drawLine(previousXPixel, previousYPixel, xScale, yToPlot);
+			
 			previousXPixel = xScale;
 			previousYPixel = yToPlot;
-			xScale += xIncrements;
-			
+			xScale += xIncrements;	
 		}
-		
-		
-		// 2) plot the points.
-		// 3) Connect the points.
-		
 	}
 	
 	public void mousePressed(MouseEvent me) // show tiny x,y values window
@@ -191,6 +184,7 @@ public class GraphPanel extends JPanel implements MouseListener {
 	public void mouseEntered(MouseEvent me){} // on these
 	public void mouseExited(MouseEvent  me){} // window events
 	
+	// Find the min in a double array.
 	private static double min(double[] array) {
         double min = array[0];
         for (int i = 1; i < array.length; i++) {
@@ -201,6 +195,7 @@ public class GraphPanel extends JPanel implements MouseListener {
         return min;
     }
 	
+	// Find the max in a double array.
 	private static double max(double[] array) {
         double max = array[0];
         for (int i = 1; i < array.length; i++) {

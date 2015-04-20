@@ -107,10 +107,12 @@ public class GraphPanel extends JPanel implements MouseListener {
 		g.drawLine(25, 0, 25, windowHeight);						      //Draw Y-Axis
 		
 		//Draw Y-Axis tics
+		// TODO: 1) Number the axes.
 		for(int i = 0; i < yValues.length; i++)
 		{
 			//					x		y
 			g.drawString("__", 25, yScale);
+			g.drawString(Double.toString(yValues[i]), 2, yScale+7);
 			yScale -= yIncrements;
 			
 		}
@@ -120,10 +122,11 @@ public class GraphPanel extends JPanel implements MouseListener {
 		{
 			//						x		y
 			g.drawString("|", xScale, windowHeight-25 );
+			g.drawString(Double.toString(xValues[i]),xScale-7,windowHeight-8);
 			xScale += xIncrements;
 		}
 		
-		// TODO: 1) Number the axes.
+		
 		// 2) plot the points.
 		// 3) Connect the points.
 		

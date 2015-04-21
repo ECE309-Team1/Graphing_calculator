@@ -109,7 +109,10 @@ public class GraphPanel extends JPanel implements MouseListener {
 			g.drawString(yString, 2, yScale+7);
 			
 			yScale -= yIncrements;
-			yStart += yValueIncrement;
+			if(yValueIncrement != 0)
+				yStart += yValueIncrement;
+			else
+				yStart += 1;
 		}
 		
 		// Resetting y to start point.

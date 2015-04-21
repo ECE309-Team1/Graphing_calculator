@@ -147,9 +147,13 @@ public class GraphPanel extends JPanel implements MouseListener {
 	{
 		// xTextField and yTextField are in the miniXYdisplayWindow
 		int xInPixels = me.getX()-25;
+		int yInPixels = me.getY()-25;
 		
-		// Test to make sure x point is within the graph
+		// Test to make sure x,y point is within the graph
 		if(xInPixels < 0 || xInPixels > (getWidth()-25*2))
+			return;
+		
+		if(yInPixels < 0 || yInPixels > (getHeight()-25*2))
 			return;
 		
 		double xValue = (xInPixels*xPixelsToValueConversionFactor)+xValues[0] ;

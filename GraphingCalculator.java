@@ -143,7 +143,7 @@ private OperandPair  op = new OperandPair();
 	public String calculate(String Expression, String x)
 			throws IllegalArgumentException {
 	    
-	    Double ans = null;	
+	    double ans;	
 		//test cases
 		if(Expression.contains("X"))
 			Expression = Expression.replaceAll("X", "x");
@@ -156,7 +156,7 @@ private OperandPair  op = new OperandPair();
 		{
 			throw new IllegalArgumentException(e.getMessage());
 		}
-		return ans.toString();
+		return Double.toString(ans);
 	}
 
 	/*******************************************************
@@ -205,7 +205,7 @@ private OperandPair  op = new OperandPair();
 			if(newTotal == 0)
 				return "0";
 			BigDecimal  totalBD = new BigDecimal(newTotal,MathContext.DECIMAL64);//set precision to 16 digits
-			totalBD = totalBD.setScale(2,BigDecimal.ROUND_UP);//scale (2) is # of digits to right of decimal point.
+			totalBD = totalBD.setScale(2,BigDecimal.ROUND_HALF_UP);//scale (2) is # of digits to right of decimal point.
 			String totalString = totalBD.toPlainString();// no exponents
 			
 			if(debug)
@@ -391,6 +391,9 @@ private OperandPair  op = new OperandPair();
 					else
 						tx = toX.getText();
 					
+					if(Double.parseDouble(tx) <= 0)
+						throw new IllegalArgumentException("x increment has to positive.");
+					
 					drawGraph(input, fx, tx);
 					
 					totalDisplay.setText("");
@@ -540,18 +543,24 @@ private OperandPair  op = new OperandPair();
 	public String replace_consts(String exp, String x)
     {
         String expression = exp;
+        double x1;
 
         // If expression contains x, replace it with input.
         // If no value is given for x, throw exception. 
         if(expression.contains("x")){
             try
             {
-            	Double.parseDouble(x);
+            	x1 = Double.parseDouble(x);
             }
             catch(Exception NumberFormatException)
             {
                 throw new IllegalArgumentException("Entered value is not a number");
             }
+            // Rounding to 2 decimal places
+            BigDecimal BDy = new BigDecimal(x1, MathContext.DECIMAL64);
+            BDy = BDy.setScale(2, BigDecimal.ROUND_HALF_UP);
+            x = BDy.toPlainString();
+            
             expression = expression.replaceAll("x", x);
         }
         
@@ -559,7 +568,7 @@ private OperandPair  op = new OperandPair();
         expression = expression.replaceAll("pi",Double.toString(Math.PI));
         expression = expression.replaceAll("PI",Double.toString(Math.PI));
         expression = expression.replaceAll("e",Double.toString(Math.E));
-        expression = expression.replaceAll("E",Double.toString(Math.E));
+        //expression = expression.replaceAll("E",Double.toString(Math.E));
         expression = expression.replaceAll("R","r");
         
         return expression;
@@ -591,7 +600,12 @@ private OperandPair  op = new OperandPair();
     		int n = exp.substring(0,m).lastIndexOf('(');
     		
     		String toSend = exp.substring(n+1, m);
-    		String result = Double.toString(evaluateComplexExpression(toSend));
+    		double res = evaluateComplexExpression(toSend);
+    		
+    		BigDecimal BDres = new BigDecimal(res, MathContext.DECIMAL64);
+    		BDres = BDres.setScale(2, BigDecimal.ROUND_HALF_UP);
+    		String result = BDres.toPlainString(); 
+    		
     		exp = exp.replace(exp.substring(n, m+1), result);
     		if(debug)
     			System.out.println("Expression: " + exp);

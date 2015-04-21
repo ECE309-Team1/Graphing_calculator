@@ -104,7 +104,7 @@ public class GraphPanel extends JPanel implements MouseListener {
 			// Number the y axis.
 			// Round y value to 2 decimal places.
 			BigDecimal  y_BD = new BigDecimal(yStart ,MathContext.DECIMAL64);//set precision to 16 digits
-			y_BD = y_BD.setScale(2,BigDecimal.ROUND_UP);//scale (2) is # of digits to right of decimal point.
+			y_BD = y_BD.setScale(2,BigDecimal.ROUND_HALF_UP);//scale (2) is # of digits to right of decimal point.
 			String yString = y_BD.toPlainString();// no exponents
 			g.drawString(yString, 2, yScale+7);
 			
@@ -127,7 +127,7 @@ public class GraphPanel extends JPanel implements MouseListener {
 			// Number the x axis.
 			// Round x value to 2 decimal places.
 			BigDecimal  xBD = new BigDecimal(xValues[i],MathContext.DECIMAL64);//set precision to 16 digits
-			xBD = xBD.setScale(2,BigDecimal.ROUND_UP);//scale (2) is # of digits to right of decimal point.
+			xBD = xBD.setScale(2,BigDecimal.ROUND_HALF_UP);//scale (2) is # of digits to right of decimal point.
 			String xString = xBD.toPlainString();// no exponents
 			g.drawString(xString,xScale-7,windowHeight-8);
 			
@@ -160,15 +160,15 @@ public class GraphPanel extends JPanel implements MouseListener {
 		
 		// Round x value to 2 decimal places.
 		BigDecimal  xBD = new BigDecimal(xValue,MathContext.DECIMAL64);//set precision to 16 digits
-		xBD = xBD.setScale(2,BigDecimal.ROUND_UP);//scale (2) is # of digits to right of decimal point.
+		xBD = xBD.setScale(2,BigDecimal.ROUND_HALF_UP);//scale (2) is # of digits to right of decimal point.
 		String xString = xBD.toPlainString();// no exponents
 		
 		xTextField.setText("X = " + xString);
 		
 		// Round y value to 2 decimal places.
-		Double yValue = Double.parseDouble(calculatorProgram.calculate(expression, xString));
+		double yValue = Double.parseDouble(calculatorProgram.calculate(expression, xString));
 		BigDecimal  yBD = new BigDecimal(yValue,MathContext.DECIMAL64);//set precision to 16 digits
-		yBD = yBD.setScale(2,BigDecimal.ROUND_UP);//scale (2) is # of digits to right of decimal point.
+		yBD = yBD.setScale(2,BigDecimal.ROUND_HALF_UP);//scale (2) is # of digits to right of decimal point.
 		String yString = yBD.toPlainString();// no exponents
 		
 		yTextField.setText("Y = " + yString);
